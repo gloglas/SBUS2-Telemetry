@@ -328,7 +328,10 @@ static void IRAM_ATTR uart_intr_handle(void *arg)
     sbus_ready = false;
     frame_ready = true;
     
-    memcpy(sbusData, rxbuf, SBUS_FRAME_SIZE);
+    for (uint8_t i = 0; i < UART_RXBUFSIZE; i++)
+    {
+      sbusData[i] = rxbuf[i];
+    }
 
     disable_receiving();
     IncreaseTimer((rxbuf[24] & 0x30) >> 4);
