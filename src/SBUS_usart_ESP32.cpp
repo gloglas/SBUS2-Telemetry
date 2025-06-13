@@ -297,6 +297,7 @@ static void IRAM_ATTR uart_intr_handle(void *arg)
     uart_flush(uart_num);
     uart_clear_intr_status(uart_num, UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
     log_i("[SBUS2] Wrong Frame length\l\n");
+    buffer_index = 0;
     return;
   }
   // digitalWrite(18,HIGH);
@@ -326,10 +327,9 @@ static void IRAM_ATTR uart_intr_handle(void *arg)
     telemetry_ready = false;
     sbus_ready = false;
     frame_ready = true;
-    for (uint8_t i = 0; i < UART_RXBUFSIZE; i++)
-    {
-      sbusData[i] = rxbuf[i];
-    }
+    
+    memcpy(sbusData, rxbuf, SBUS_FRAME_SIZE);
+
     disable_receiving();
     IncreaseTimer((rxbuf[24] & 0x30) >> 4);
     buffer_index = 0;
@@ -355,6 +355,7 @@ static void IRAM_ATTR uart_intr_handle(void *arg)
       uart_flush(uart_num);
       uart_clear_intr_status(uart_num, UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
       log_i("[SBUS2]Invalid Frame End Byte");
+      buffer_index = 0;
     }
     // pinMatrixOutDetach(tx_pin,false,true);
   }
@@ -363,6 +364,7 @@ static void IRAM_ATTR uart_intr_handle(void *arg)
     uart_flush(uart_num);
     uart_clear_intr_status(uart_num, UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
     log_i("[SBUS2] Invalid Frame Start Byte");
+    buffer_index = 0;
   }
   else if ((buffer_index == SLOT_DATA_LENGTH) && ((((rxbuf[0] & 0x0f) == 0x03) || (rxbuf[0] & 0x0f) == 0x0B))) // Telemetry Slot
   {
