@@ -410,7 +410,7 @@ static void IRAM_ATTR ISR_transmit_frame(void *arg)
   timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_1);
   TIMERG0.hw_timer[1].config.tx_alarm_en = 1;
 #endif
-  digitalWrite(18, HIGH);
+  //digitalWrite(18, HIGH);
   pinMatrixOutDetach(tx_pin, false, true);
   if (sequence_count < 8) // transmit slots
   {
